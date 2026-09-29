@@ -6,5 +6,5 @@
 
 # Build in a separate directory
 %:
-	dh $@ --builddirectory --parallel --with autoreconf
+	dh $@ --builddirectory --with autoreconf
 

@@ -1,9 +1,14 @@
 Source: libnss-vrfdns
 Section: net
 Priority: optional
-Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
-Standards-Version: 3.9.6
-Build-Depends: debhelper (>= 9), debhelper (>= 9.20160403~) | dh-autoreconf, pkg-config, autoconf-archive
+Maintainer: NuDanOS Maintainers <jon@fernandez.tech>
+Standards-Version: 4.7.2
+Build-Depends: debhelper-compat (= 13),
+ pkg-config,
+ autoconf-archive
+Rules-Requires-Root: no
+Vcs-Git: https://github.com/nudanos/libnss-vrfdns.git
+Vcs-Browser: https://github.com/nudanos/libnss-vrfdns
 
 Package: libnss-vrfdns
 Architecture: any

@@ -1,3 +1,9 @@
+libnss-vrfdns (0.12) trixie; urgency=medium
+
+  * Port to Debian 13 (trixie): debhelper-compat 13, Standards-Version 4.7.2, Rules-Requires-Root, NuDanOS Vcs.
+
+ -- NuDanOS Maintainers <jon@fernandez.tech>  Mon, 28 Sep 2026 22:29:26 -0700
+
 libnss-vrfdns (0.11) unstable; urgency=medium
 
   * RES_USE_INET6 got removed in glibc 2.30
