@@ -47,7 +47,9 @@
 #define ENTDATA hostent_data
 struct hostent_data
 {
+	// cppcheck-suppress unusedStructMember ; reason: used through ENTDATA in the parser macros (entdata->host_addr)
 	unsigned char host_addr[16]; /* IPv4 or IPv6 address.  */
+	// cppcheck-suppress unusedStructMember ; reason: the address list the parser macros build points into it
 	char *h_addr_ptrs[2];       /* Points to that and null terminator.  */
 };
 
@@ -127,6 +129,7 @@ _nss_vrffiles_gethostbyname3_r (const char *name, int af, struct hostent *result
 				char *buffer, size_t buflen, int *errnop,
 				int *herrnop, int32_t *ttlp, char **canonp)
 {
+	(void) ttlp;	/* NSS API: hosts files carry no TTL */
 	uintptr_t pad = -(uintptr_t) buffer % __alignof__ (struct hostent_data);
 	buffer += pad;
 	buflen = buflen > pad ? buflen - pad : 0;
@@ -180,6 +183,7 @@ again:
 				do {
 					LOOKUP_NAME_CASE (h_name, h_aliases)
 					result = old_result;
+				// cppcheck-suppress knownConditionTrueFalse ; reason: glibc's run-once loop around LOOKUP_NAME_CASE, whose break leaves it
 				} while ((matches = 0));
 
 				if (matches) {
@@ -196,7 +200,7 @@ again:
 
 					/* Count the new aliases and the length of the strings.  */
 					while (tmp_result_buf.h_aliases[newaliases] != NULL) {
-						char *cp = tmp_result_buf.h_aliases[newaliases];
+						const char *cp = tmp_result_buf.h_aliases[newaliases];
 						++newaliases;
 						newstrlen += strlen (cp) + 1;
 					}
@@ -339,6 +343,7 @@ _nss_vrffiles_gethostbyname4_r (const char *name, struct gaih_addrtuple **pat,
 				char *buffer, size_t buflen, int *errnop,
 				int *herrnop, int32_t *ttlp)
 {
+	(void) ttlp;	/* NSS API: hosts files carry no TTL */
 	vrffiles_hook();
 
 	/* Reset file pointer to beginning or open file.  */
@@ -382,7 +387,7 @@ _nss_vrffiles_gethostbyname4_r (const char *name, struct gaih_addrtuple **pat,
 			while (result.h_aliases[naliases] != NULL)
 				++naliases;
 			char *bufferend = (char *) &result.h_aliases[naliases + 1];
-			assert (buflen >= bufferend - buffer);
+			assert (buflen >= (size_t) (bufferend - buffer));
 			buflen -= bufferend - buffer;
 			buffer = bufferend;
 
@@ -392,10 +397,10 @@ _nss_vrffiles_gethostbyname4_r (const char *name, struct gaih_addrtuple **pat,
 			/* Create the record the caller expects.  There is only one address.  */
 			assert (result.h_addr_list[1] == NULL);
 			if (*pat == NULL) {
-				uintptr_t pad = (-(uintptr_t) buffer
+				uintptr_t tuple_pad = (-(uintptr_t) buffer
 					% __alignof__ (struct gaih_addrtuple));
-				buffer += pad;
-				buflen = buflen > pad ? buflen - pad : 0;
+				buffer += tuple_pad;
+				buflen = buflen > tuple_pad ? buflen - tuple_pad : 0;
 
 				if (__builtin_expect (buflen < sizeof (struct gaih_addrtuple),
 						0)) {

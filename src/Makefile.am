@@ -27,3 +27,9 @@ install-exec-hook:
 	echo "dest: $(DESTDIR) $(libdir)"
 	rm -f $(DESTDIR)$(libdir)/libnss_vrfdns.la
 	rm -f $(DESTDIR)$(libdir)/libnss_vrffiles.la
+
+# NuDanOS: get_vrfname picks the VRF of every lookup
+check_PROGRAMS = vrfname_test
+vrfname_test_SOURCES = vrfname_test.c nss_vrfhook.c
+vrfname_test_CFLAGS = $(AM_CFLAGS)
+TESTS = vrfname_test

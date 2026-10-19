@@ -73,17 +73,15 @@ static fpos_t position;
 static enum { nouse, getent, getby } last_use;
 static int keep_stream;
 
-int vrffiles_hook()
+void vrffiles_hook(void)
 {
-        char *vrfname = get_vrfname();
+        const char *vrfname = get_vrfname();
 
-        memset(host_path,0,254);
+        memset(host_path, 0, sizeof(host_path));
         if (!strcmp(vrfname, "default"))
-                snprintf(host_path, 511, "/etc/hosts");
+                snprintf(host_path, sizeof(host_path), "/etc/hosts");
         else
-                snprintf(host_path, 511, "/run/dns/vrf/%s/hosts", vrfname);
-
-        free(vrfname);
+                snprintf(host_path, sizeof(host_path), "/run/dns/vrf/%s/hosts", vrfname);
 }
 
 /* Open database file if not already opened.  */
@@ -198,7 +196,7 @@ get_contents (char *linebuf, size_t len, FILE *stream)
 	{
 		int curlen = ((remaining_len > (size_t) INT_MAX) ? INT_MAX
 			: remaining_len);
-		char *p = fgets_unlocked (curbuf, curlen, stream);
+		const char *p = fgets_unlocked (curbuf, curlen, stream);
 
 		((unsigned char *) curbuf)[curlen - 1] = 0xff;
 
@@ -207,6 +205,7 @@ get_contents (char *linebuf, size_t len, FILE *stream)
 			return gcr_error;
 
 		/* Done reading in the line.  */
+		// cppcheck-suppress knownConditionTrueFalse ; reason: fgets_unlocked overwrites the 0xff sentinel when the line fills the buffer, which cppcheck does not model
 		if (((unsigned char *) curbuf)[curlen - 1] == 0xff)
 			return gcr_ok;
 
@@ -287,8 +286,6 @@ CONCAT(_nss_files_get,ENTNAME_r) (struct STRUCTURE *result, char *buffer,
 
 	/* Be prepared that the set*ent function was not called before.  */
 	if (stream == NULL) {
-		int save_errno = errno;
-
 		status = internal_setent (0);
 
 		if (status == NSS_STATUS_SUCCESS && fgetpos (stream, &position) < 0) {

@@ -102,21 +102,16 @@ _nss_vrfdns_gethostbyname2_r (const char *name, int af, struct hostent *result,
 			   char *buffer, size_t buflen, int *errnop,
 			   int *h_errnop)
 {
-  char *vrfname = get_vrfname();
+  const char *vrfname = get_vrfname();
   if (strcmp(vrfname, "default") != 0) {
     char _vrf_resconf_path[1024];
     memset(_vrf_resconf_path, '\0', sizeof(_vrf_resconf_path));
     snprintf(_vrf_resconf_path, sizeof(_vrf_resconf_path), "/run/dns/vrf/%s/resolv.conf", vrfname);
     if (_vrf_res_ninit (&_res, _vrf_resconf_path) == -1) {
-        if(vrfname)
-            free(vrfname);
         return (-1);
     }
 
   }
-
-  if(vrfname)
-    free(vrfname);
 
   return _nss_dns_gethostbyname3_r (name, af, result, buffer, buflen, errnop,
 				    h_errnop, NULL, NULL);
@@ -127,11 +122,9 @@ _nss_vrfdns_gethostbyname_r (const char *name, struct hostent *result,
 			  char *buffer, size_t buflen, int *errnop,
 			  int *h_errnop)
 {
-  char *vrfname = get_vrfname();
-  enum nss_status status = NSS_STATUS_NOTFOUND;
+  const char *vrfname = get_vrfname();
+  enum nss_status status;
   if (strcmp(vrfname, "default") == 0) {
-    if(vrfname)
-        free(vrfname);
     /* Default VRF, don't use VRF resolver (i.e. also uses global _res) */
     return _nss_dns_gethostbyname_r (name, result, buffer, buflen, errnop,
 				    h_errnop);
@@ -140,12 +133,8 @@ _nss_vrfdns_gethostbyname_r (const char *name, struct hostent *result,
     memset(_vrf_resconf_path, '\0', sizeof(_vrf_resconf_path));
     snprintf(_vrf_resconf_path, sizeof(_vrf_resconf_path), "/run/dns/vrf/%s/resolv.conf", vrfname);
     if (_vrf_res_ninit (&_res, _vrf_resconf_path) == -1) {
-        if(vrfname)
-            free(vrfname);
         return (-1);
     }
-    if(vrfname)
-        free(vrfname);
 
     status = _nss_dns_gethostbyname3_r (name, AF_INET, result, buffer,
                                         buflen, errnop, h_errnop, NULL, NULL);
@@ -159,20 +148,15 @@ _nss_vrfdns_gethostbyaddr_r (const void *addr, socklen_t len, int af,
 			  struct hostent *result, char *buffer, size_t buflen,
 			  int *errnop, int *h_errnop)
 {
-  char *vrfname = get_vrfname();
+  const char *vrfname = get_vrfname();
   if (strcmp(vrfname, "default") != 0) {
     char _vrf_resconf_path[1024];
     memset(_vrf_resconf_path, '\0', sizeof(_vrf_resconf_path));
     snprintf(_vrf_resconf_path, sizeof(_vrf_resconf_path), "/run/dns/vrf/%s/resolv.conf", vrfname);
     if (_vrf_res_ninit (&_res, _vrf_resconf_path) == -1) {
-        if(vrfname)
-            free(vrfname);
         return (-1);
     }
   }
-
-  if(vrfname)
-        free(vrfname);
 
   return _nss_dns_gethostbyaddr2_r (addr, len, af, result, buffer, buflen,
         				    errnop, h_errnop, NULL);
@@ -183,6 +167,7 @@ _nss_vrfdns_gethostbyaddr2_r (const void *addr, socklen_t len, int af,
 			   struct hostent *result, char *buffer, size_t buflen,
 			   int *errnop, int *h_errnop, int32_t *ttlp)
 {
+    (void) ttlp;    /* NSS API: no TTL from this backend */
     return _nss_vrfdns_gethostbyaddr_r (addr, len, af, result, buffer,
                                            buflen, errnop, h_errnop);
 }

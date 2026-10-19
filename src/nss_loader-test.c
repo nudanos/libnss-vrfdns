@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
-    struct hostent *he2;
+    const struct hostent *he2;
     struct in_addr ipv4addr;
     //reverse
     inet_pton(AF_INET, inet_ntoa(*addr_list[0]), &ipv4addr);

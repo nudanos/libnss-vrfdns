@@ -1,0 +1,5 @@
+# NuDanOS lint (distro docs/porting.md).
+skip:
+  # a template #included by vrffiles-hosts.c, whose macros it needs
+  # (CONCAT and friends): checked through vrffiles-hosts.c
+  - "src/vrffiles-XXX.c"

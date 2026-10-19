@@ -68,6 +68,7 @@ struct parser_data
 #else
 # define ENTDATA_DECL(data)
 #endif
+    // cppcheck-suppress unusedStructMember ; reason: the line buffer, used through data->linebuffer in vrffiles-XXX.c
     char linebuffer[0];
   };
 
@@ -242,7 +243,7 @@ strtou32 (const char *nptr, char **endptr, int base)
 
 static inline char **
 __attribute ((always_inline))
-parse_list (char **linep, char *eol, char *buf_end, int terminator_c,
+parse_list (char **linep, char *eol, const char *buf_end, int terminator_c,
 	    int *errnop)
 {
   char *line = *linep;

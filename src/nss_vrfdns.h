@@ -10,10 +10,10 @@
 #include <resolv.h>
 
 /* nss_vrfhook.c */
-char * get_vrfname(void);
+const char *get_vrfname(void);
 
 /* resolv/res_init.c */
-int _vrf_res_ninit(res_state statp, char *resconf_path);
-int __vrf_res_vinit(res_state statp, int preinit, char *resconf_path);
+int _vrf_res_ninit(res_state statp, const char *resconf_path);
+int __vrf_res_vinit(res_state statp, int preinit, const char *resconf_path);
 
 #endif /* NSS_VRFDNS_H */

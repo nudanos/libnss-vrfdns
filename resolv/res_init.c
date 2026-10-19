@@ -89,7 +89,7 @@
 # define MAXPACKET	65536
 #endif
 
-int __vrf_res_vinit(res_state statp, int preinit, char *resconf_path);
+int __vrf_res_vinit(res_state statp, int preinit, const char *resconf_path);
 static const char sort_mask_chars[] = "/&";
 #define ISSORTMASK(ch) (strchr(sort_mask_chars, ch) != NULL)
 static u_int32_t net_mask (struct in_addr);
@@ -104,7 +104,7 @@ unsigned long long int __res_initstamp;
  * Return 0 if completes successfully, -1 on error
  */
 int
-_vrf_res_ninit(res_state statp, char *resconf_path) {
+_vrf_res_ninit(res_state statp, const char *resconf_path) {
 	if (__res_initstamp == 0) {
         ++__res_initstamp;
     }
@@ -113,6 +113,7 @@ _vrf_res_ninit(res_state statp, char *resconf_path) {
 
 static void
 res_setoptions(res_state statp, const char *options, const char *source) {
+	(void) source;	/* kept from glibc, where it names the option source in debug output */
 	const char *cp = options;
 	int i;
 
@@ -164,7 +165,7 @@ res_setoptions(res_state statp, const char *options, const char *source) {
 		    uint8_t len;
 		    uint8_t clear;
 		    unsigned long int flag;
-		  } options[] = {
+		  } option_table[] = {
 #define STRnLEN(str) str, sizeof (str) - 1
 #ifdef RES_USEBSTRING
 		    { STRnLEN ("ip6-bytestring"), 0, RES_USEBSTRING },
@@ -181,15 +182,15 @@ res_setoptions(res_state statp, const char *options, const char *source) {
 		    { STRnLEN ("no-tld-query"), 0, RES_NOTLDQUERY },
 		    { STRnLEN ("use-vc"), 0, RES_USEVC }
 		  };
-#define noptions (sizeof (options) / sizeof (options[0]))
-		  int i;
-		  for (i = 0; i < noptions; ++i)
-		    if (strncmp (cp, options[i].str, options[i].len) == 0)
+#define noptions (sizeof (option_table) / sizeof (option_table[0]))
+		  size_t opt;
+		  for (opt = 0; opt < noptions; ++opt)
+		    if (strncmp (cp, option_table[opt].str, option_table[opt].len) == 0)
 		      {
-			if (options[i].clear)
-			  statp->options &= options[i].flag;
+			if (option_table[opt].clear)
+			  statp->options &= option_table[opt].flag;
 			else
-			  statp->options |= options[i].flag;
+			  statp->options |= option_table[opt].flag;
 			break;
 		      }
 		  if (i == noptions) {
@@ -215,7 +216,7 @@ net_mask (struct in_addr in)
 }
 
 int
-__vrf_res_vinit(res_state statp, int preinit, char *resconf_path) {
+__vrf_res_vinit(res_state statp, int preinit, const char *resconf_path) {
 	FILE *fp;
 	char *cp, **pp;
 	int n;
