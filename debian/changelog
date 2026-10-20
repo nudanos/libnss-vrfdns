@@ -1,3 +1,10 @@
+libnss-vrfdns (0.13) trixie; urgency=medium
+
+  * Code-quality lint fixes (distro docs/porting.md): analyzer findings
+    fixed, see the git log.
+
+ -- NuDanOS Maintainers <jon@fernandez.tech>  Tue, 20 Oct 2026 11:56:42 +0000
+
 libnss-vrfdns (0.12) trixie; urgency=medium
 
   * Port to Debian 13 (trixie): debhelper-compat 13, Standards-Version 4.7.2, Rules-Requires-Root, NuDanOS Vcs.
